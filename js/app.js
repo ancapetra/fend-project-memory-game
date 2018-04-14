@@ -54,9 +54,19 @@ let matchCount = 0;
 document.addEventListener('DOMContentLoaded', newGame);
 
 /**
- * Event listener for the 'Restart Game' button
+ * Event listeners for the 'Restart Game' button
  */
 document.querySelector('.fa-repeat').addEventListener('click', newGame);
+
+/**
+ * Event listeners for the modal's buttons
+ */
+document.querySelector('.modal-close').addEventListener('click', closeModal);
+document.querySelector('.modal-no').addEventListener('click', closeModal);
+document.querySelector('.modal-yes').addEventListener('click', function(){
+    newGame();
+    closeModal();
+});
 
 
 /**
@@ -99,7 +109,7 @@ class MemoryTimer {
      * @returns {string}
      */
 	getTime(ticks) {
-		var hours = this.format(Math.floor(ticks / 3600));
+		let hours = this.format(Math.floor(ticks / 3600));
 		ticks = ticks % 3600;
 		let minutes = this.format(Math.floor(ticks / 60));
 		let seconds = this.format(ticks % 60);
@@ -193,9 +203,11 @@ class MemoryStorage {
 		var records = [];
 		if (this.isAvailable()) {
             for (let key in localStorage) {
-                records.push(this.getItem(key));
+            	let item = this.getItem(key);
+                if (item !== null) {
+                    records.push(item);
+				}
             }
-            records.sort();
         }
 		return records;
 	}
@@ -239,60 +251,15 @@ function checkWinner() {
 
 	timer.stop();
 
-	let ticks = timer.getTicks();
-	let timeSpent = timer.getTime(ticks);
-	MemoryStorage.setItem(Date.now(), ticks);
+    let ticks = timer.getTicks();
+    let timeSpent = timer.getTime(ticks);
+    MemoryStorage.setItem(Date.now(), ticks);
 
-	let leaderboard = getLeaderboard();
+    showModal();
+}
 
-	let stars = document.querySelectorAll(".fa-star").length;
-	var message = `Congratulations! You've won ${stars} star(s) in ${timeSpent}!`;
-	if (leaderboard.length > 0) {
-        message += `
-Leaderboard:`;
-
-		let limit = 10;
-		let found = shown = false;
-		var myPosition = 0;
-		for (let i = 0; i<leaderboard.length; i++) {
-			let position = i + 1;
-			let record = leaderboard[i];
-			if (position <= limit) {
-				var arrow = "\u25b7";
-				if (timeSpent === record) {
-					if (found === false) {
-						var arrow = "\u25b6";
-					}
-					found = shown = true;
-				}
-				message += `
-${arrow} ${position}. ${record}`;
-			} else {
-				if (timeSpent === record && found === false) {
-					found = true;
-					myPosition = position;
-				}
-			}
-		}
-		if (shown === false) {
-			var arrow = "\u25b6";
-			if (myPosition > (limit + 1)) {
-				message += `
-...`;
-			}
-			message += `
-${arrow} ${myPosition}. ${timeSpent}`;
-		}
-	}
-	message += `
-Play again?`;
-
-	/**
-	 * Offers the player to play a new game
-	 */
-	if (confirm(message)) {
-        newGame();
-	}
+function closeModal() {
+    document.querySelector(".modal").classList.add('hidden');
 }
 
 /**
@@ -320,6 +287,16 @@ function emptyDeck() {
 }
 
 /**
+ * Removes all entries from the leaderboard shown in the UI
+ */
+function emptyLeaderboard() {
+    let records = document.querySelectorAll(".leaderboard ul li");
+    for (let record of records) {
+        record.remove();
+    }
+}
+
+/**
  * Fetches the leaderboard from the browser's local storage
  * @returns {Array}
  */
@@ -332,6 +309,7 @@ function getLeaderboard() {
             leaderboard.push(timer.getTime(record));
         }
     }
+    leaderboard.sort();
 
     return leaderboard;
 }
@@ -366,6 +344,7 @@ function makeMatch() {
 	let cards = document.querySelectorAll('.' + shape);
 	for (let card of cards) {
 		card.parentNode.className = "card match";
+		card.parentNode.removeEventListener("click", playCard);
 	}
 	resetOpenCards();
 }
@@ -522,6 +501,70 @@ function showCard(event) {
         return true;
     }
     return false;
+}
+
+/**
+ * Displays a modal window once the player has won the game
+ */
+function showModal() {
+    let ticks = timer.getTicks();
+    let stars = document.querySelectorAll(".fa-star").length;
+    let timeSpent = timer.getTime(ticks);
+
+    document.querySelector(".modal-message").innerText = `You've won ${stars} star(s) in ${timeSpent}!`;
+
+    let leaderboard = getLeaderboard();
+    if (leaderboard.length > 0) {
+        let limit = 10;
+        var myPosition = 0;
+        var myRecord = "myRecord";
+        let found = shown = false;
+
+        document.querySelector(".leaderboard").classList.remove('hidden');
+
+        emptyLeaderboard();
+        let ul = document.querySelector(".leaderboard ul");
+        for (let i = 0; i<leaderboard.length; i++) {
+            let position = i + 1;
+            let record = leaderboard[i];
+
+            if (position <= limit) {
+                let iNode = document.createElement("i");
+                iNode.innerText = position;
+
+                let li = document.createElement("li");
+                if (timeSpent === record) {
+                    li.className = myRecord;
+                    myRecord = '';
+                    found = shown = true;
+                }
+                li.appendChild(iNode);
+                li.innerHTML += record;
+                ul.appendChild(li);
+            } else {
+                if (timeSpent === record && found === false) {
+                    found = true;
+                    myPosition = position;
+                }
+            }
+        }
+
+        if (shown === false && leaderboard.length > 10) {
+            if (myPosition > (limit + 1)) {
+                let li = document.createElement("li");
+                li.innerText = '...';
+                ul.appendChild(li);
+            }
+            let iNode = document.createElement("i");
+            iNode.innerText = myPosition;
+            let li = document.createElement("li");
+            li.appendChild(iNode);
+            li.innerHTML += timeSpent;
+            ul.appendChild(li);
+        }
+    }
+
+    document.querySelector(".modal").classList.remove('hidden');
 }
 
 /**

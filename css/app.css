@@ -17,7 +17,7 @@ body {
 }
 
 body {
-    background: #ffffff url('../img/geometry2.png'); /* Background pattern from Subtle Patterns */
+    background: #ffffff url('../img/background2.jpg'); /* Background pattern from Subtle Patterns */
     font-family: 'Coda', cursive;
 }
 
@@ -31,6 +31,7 @@ body {
 h1 {
     font-family: 'Audiowide', cursive;
     font-weight: 300;
+    color: #ffc;
 }
 
 h1:hover {
@@ -44,7 +45,7 @@ h1:hover {
 .deck {
     width: 660px;
     min-height: 680px;
-    background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
+    background: linear-gradient(160deg, transparent, #a0a0a0a0 100%, #aa7ecd 100%);
     padding: 32px;
     border-radius: 10px;
     box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
@@ -58,7 +59,7 @@ h1:hover {
 .deck .card {
     height: 125px;
     width: 125px;
-    background: #2e3d49;
+    background: #ffffde url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
     font-size: 0;
     color: #ffffff;
     border-radius: 8px;
@@ -80,8 +81,8 @@ h1:hover {
 
 .deck .card.open {
     transform: rotateY(0);
-    background: #02b3e4;
     cursor: default;
+    background: #603 url("https://www.transparenttextures.com/patterns/grunge-wall.png");
     -webkit-perspective: 1000;
     -moz-perspective: 1000;
     -o-perspective: 1000;
@@ -95,13 +96,17 @@ h1:hover {
     transform: rotateY(180deg);
 }
 
+.deck .card:hover {
+    opacity: 0.9;
+}
+
 .deck .card.show {
     font-size: 33px;
 }
 
 .deck .card.match {
     cursor: default;
-    background: #02ccba;
+    background: #036 url("https://www.transparenttextures.com/patterns/grunge-wall.png");
     font-size: 33px;
 }
 
@@ -116,6 +121,7 @@ h1:hover {
     justify-content: space-between;
     display: flex;
     flex-wrap: wrap;
+    color: #ffc;
 }
 
 .score-panel .stars {
@@ -141,6 +147,174 @@ h1:hover {
 
 .restart:hover {
     text-shadow: 2px 1px 1px grey;
+}
+
+/*
+ * Make it Modal
+ */
+
+.hidden {
+    display: none;
+}
+
+.myRecord {
+    font-size: 22px;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px black;
+}
+
+
+/* The Modal (background) */
+.modal {
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0;
+    border: 1px solid #331900;
+    width: 30%;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    border-radius: 20px;
+}
+
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top:-300px; opacity:0}
+    to {top:0; opacity:1}
+}
+
+/* The Close Button */
+.modal-close {
+    color: #ffc;
+    float: right;
+    font-size: 34px;
+    font-weight: bold;
+    padding-top: 0.4em;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.modal-header {
+    padding: 2px 16px;
+    background: #808080 url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    color: #ffc;
+    text-align: center;
+    font-family: 'Audiowide', cursive;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-body {
+    padding: 2px 16px;
+    background: #808080 url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    color: #ffc;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 20px;
+    text-align: center;
+}
+
+.modal-message {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.leaderboard p {
+    width: 100%;
+    font-weight: bold;
+    text-align: center;
+}
+
+.leaderboard li {
+    list-style-type: none;
+}
+
+.leaderboard ul {
+    padding: 0;
+}
+
+.leaderboard i {
+    width: 20px;
+    display: inline-block;
+    margin-right: 15px;
+    text-align: right;
+    font-style: normal;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px black;
+}
+
+.modal-question {
+    text-align: center;
+    font-size: 25px;
+    font-family: 'Audiowide', cursive;
+}
+
+.modal-footer {
+    padding: 1px 16px;
+    padding-bottom: 1em;
+    background: #808080 url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    color: white;
+    text-align: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+button.modal-yes {
+    font-size: 20px;
+    color: #ffc;
+    background: rgb(0, 255, 0, 0.4) url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    width: 70px;
+    height: 35px;
+    margin-right: 20px;
+    cursor: pointer;
+    border-radius: 30px;
+    font-family: 'Audiowide', cursive;
+}
+
+button.modal-no {
+     font-size: 20px;
+     color: #ffc;
+     background: rgb(255, 0, 0, 0.4) url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+     width: 70px;
+     height: 35px;
+     margin-left: 20px;
+     cursor: pointer;
+     border-radius: 30px;
+     font-family: 'Audiowide', cursive;
+}
+
+button:hover {
+    opacity: 0.7;
 }
 
 /*
@@ -201,6 +375,18 @@ h1:hover {
         width: 20px;
         margin-top: 0.5em;
     }
+
+    .modal-content {
+        width: 270px;
+    }
+
+    .modal-header {
+        font-size: 12px;
+    }
+
+    span.modal-close {
+        padding-top: 0.1em;
+    }
 }
 
 @media screen and (min-width: 400px) and (max-width: 549px) {
@@ -248,6 +434,18 @@ h1:hover {
     span.moves {
         width: 20px;
         margin-top: 0.5em;
+    }
+
+    .modal-content {
+        width: 280px;
+    }
+
+    .modal-header {
+        font-size: 12px;
+    }
+    
+    span.modal-close {
+        padding-top: 0.1em;
     }
 }
 
@@ -312,6 +510,18 @@ h1:hover {
         margin-top: 0.3em;
         font-size: 20px;     
     }
+
+    .modal-content {
+        width: 300px;
+    }
+
+    .modal-header {
+        font-size: 14px;
+    }
+    
+    span.modal-close {
+        padding-top: 0.25em;
+    }
 }
 
 
@@ -366,5 +576,17 @@ h1:hover {
         width: 30px;
         margin-top: 0.3em;
         font-size: 20px;     
+    }
+    .modal-content {
+        width: 380px;
+    }
+
+    .modal-header {
+        font-size: 20px;
+    }
+    
+    span.modal-close {
+        padding-top: 0.5em;
+        font-size: 40px;
     }
 }
