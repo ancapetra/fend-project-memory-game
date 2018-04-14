@@ -1,35 +1,103 @@
-/*
- * Create a list that holds all of your cards
+/**
+ * Constant and variable definitions
  */
 
+/**
+ * Shapes assigned to the cards
+ * @type {string[]}
+ */
 const shapes = [
-	"fa-diamond", "fa-diamond",
-	"fa-paper-plane-o", "fa-paper-plane-o",
-	"fa-anchor", "fa-anchor",
-	"fa-bolt", "fa-bolt",
-	"fa-cube", "fa-cube",
-	"fa-bomb", "fa-bomb",
-	"fa-leaf", "fa-leaf",
-	"fa-bicycle", "fa-bicycle"
-]
-let openCards = []
+    "fa-anchor", "fa-anchor",
+    "fa-bicycle", "fa-bicycle",
+    "fa-bolt", "fa-bolt",
+    "fa-bomb", "fa-bomb",
+    "fa-cube", "fa-cube",
+    "fa-diamond", "fa-diamond",
+    "fa-leaf", "fa-leaf",
+    "fa-paper-plane-o", "fa-paper-plane-o"
+];
 
+/**
+ * First threshold to remove a star
+ * @type {number}
+ */
+const ratingThreshold1 = 35;
+
+/**
+ * Second threshold to remove a star
+ * @type {number}
+ */
+const ratingThreshold2 = 45;
+
+/**
+ * Object containing the open cards
+ * @type {{}}
+ */
+let openCards = {};
+
+/**
+ * Number of moves used by the player in a match
+ * @type {number}
+ */
 let moves = 0;
 
+/**
+ * Number of matched cards
+ * @type {number}
+ */
 let matchCount = 0;
 
+
+/**
+ * Event listener to initialize the game when the page is ready
+ */
+document.addEventListener('DOMContentLoaded', newGame);
+
+/**
+ * Event listener for the 'Restart Game' button
+ */
+document.querySelector('.fa-repeat').addEventListener('click', newGame);
+
+
+/**
+ * Classes
+ */
+
+/**
+ * Timer class to keep track of elapsed time
+ */
 class MemoryTimer {
+    /**
+	 * Class constructor
+     */
 	constructor() {
 		this.node = document.querySelector(".timer");
 		this.ticks = 0;
 		this.interval = 0;
 	}
+
+    /**
+	 * Adds leading zero to a digit
+     * @param subject
+     * @returns {string}
+     */
 	format(subject) {
 		return subject.toString().padStart(2, "0");
 	}
+
+    /**
+	 * Returns the number of elapsed seconds
+     * @returns {number}
+     */
 	getTicks() {
 		return this.ticks;
 	}
+
+    /**
+	 * Transforms seconds to a HH:MM:SS formatted timestamp
+     * @param ticks
+     * @returns {string}
+     */
 	getTime(ticks) {
 		var hours = this.format(Math.floor(ticks / 3600));
 		ticks = ticks % 3600;
@@ -37,173 +105,264 @@ class MemoryTimer {
 		let seconds = this.format(ticks % 60);
 		return `${hours}:${minutes}:${seconds}`;
 	}
+
+    /**
+	 * Resets timer parameters to their initial values
+     */
 	reset() {
+		this.stop();
+
 		this.ticks = 0;
 		this.interval = 0;
 		this.node.innerText = "00:00:00";
 	}
+
+    /**
+	 * Starts counting seconds (if there isn't already an active timee)
+     */
 	start() {
 		if (this.interval !== 0) {
 			return;
 		}
+
 		this.interval = setInterval("timer.tick()", 1000);
 	}
+
+    /**
+	 * Stops the timee
+     */
 	stop() {
 		clearInterval(this.interval);
 	}
+
+    /**
+	 * Increments number of seconds elapsed and updates the timer shown on the page
+     */
 	tick() {
 		this.ticks++;
 		this.update();
 	}
+
+    /**
+	 * Updates the timer shown on the page
+     */
 	update() {
 		this.node.innerText = this.getTime(this.ticks);
 	}
 }
 var timer = new MemoryTimer();
 
+/**
+ * Storage class used for the leaderboard
+ */
 class MemoryStorage {
+    /**
+	 * Clears the browsers local storage (Empties the leaderboard)
+     */
 	static clear() {
 		localStorage.clear();
 	}
+
+    /**
+	 * Gets an item from the local storage
+     * @param key
+     * @returns {string | null}
+     */
 	static getItem(key) {
+		if (this.isAvailable() === false) {
+			return;
+		}
 		return localStorage.getItem(key);
 	}
+
+    /**
+	 * Checks if localStorage is available for use
+	 * (Becasue in Edge we don't have permissions to use it)
+     * @returns {boolean}
+     */
+	static isAvailable() {
+		return (typeof localStorage) !== "undefined";
+	}
+
+    /**
+	 * Gets all items in ascending order from the local storage
+     * @param key
+     * @returns {Array}
+     */
 	static getItems(key) {
 		var records = [];
-		for (let key in localStorage) {
-			records.push(this.getItem(key));
-		}
-		records.sort();
+		if (this.isAvailable()) {
+            for (let key in localStorage) {
+                records.push(this.getItem(key));
+            }
+            records.sort();
+        }
 		return records;
 	}
+
+    /**
+	 * Stores an item in the local storage
+     * @param key
+     * @param value
+     */
 	static setItem(key, value) {
+        if (this.isAvailable() === false) {
+            return;
+        }
 		localStorage.setItem(key, value);
 	}
 }
 
 
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
+/**
+ * Functions
  */
 
-document.querySelector('.fa-repeat').addEventListener('click', function(){
-	init();
-});
+/**
+ * Adds a card to the open cards
+ * @param key
+ * @param value
+ */
+function addToOpenCards(key, value) {
+    openCards[key] = value;
+}
 
+/**
+ * Checks if all the cards are matched
+ * Displays a congratulations message including a leaderboard
+ * Offers the player to play a new game
+ */
+function checkWinner() {
+    if (matchCount !== shapes.length) {
+		return;
+    }
+
+	timer.stop();
+
+	let ticks = timer.getTicks();
+	let timeSpent = timer.getTime(ticks);
+	MemoryStorage.setItem(Date.now(), ticks);
+
+	let leaderboard = getLeaderboard();
+
+	let stars = document.querySelectorAll(".fa-star").length;
+	var message = `Congratulations! You've won ${stars} star(s) in ${timeSpent}!`;
+	if (leaderboard.length > 0) {
+        message += `
+Leaderboard:`;
+
+		let limit = 10;
+		let found = shown = false;
+		var myPosition = 0;
+		for (let i = 0; i<leaderboard.length; i++) {
+			let position = i + 1;
+			let record = leaderboard[i];
+			if (position <= limit) {
+				var arrow = "\u25b7";
+				if (timeSpent === record) {
+					if (found === false) {
+						var arrow = "\u25b6";
+					}
+					found = shown = true;
+				}
+				message += `
+${arrow} ${position}. ${record}`;
+			} else {
+				if (timeSpent === record && found === false) {
+					found = true;
+					myPosition = position;
+				}
+			}
+		}
+		if (shown === false) {
+			var arrow = "\u25b6";
+			if (myPosition > (limit + 1)) {
+				message += `
+...`;
+			}
+			message += `
+${arrow} ${myPosition}. ${timeSpent}`;
+		}
+	}
+	message += `
+Play again?`;
+
+	/**
+	 * Offers the player to play a new game
+	 */
+	if (confirm(message)) {
+        newGame();
+	}
+}
+
+/**
+ * Removes a star when a threshold is reached
+ * @returns {undefined}
+ */
+function decreaseStars() {
+    if (moves === ratingThreshold1) {
+        return removeStar();
+    }
+
+    if (moves === ratingThreshold2) {
+        return removeStar();
+    }
+}
+
+/**
+ * Removes all cards from the deck
+ */
 function emptyDeck() {
 	let cards = document.querySelectorAll('.card');
 	for (let card of cards) {
-	    card.remove();
+		card.remove();
   	}
 }
 
-function rebuildDeck(shapes) {
-	emptyDeck();
+/**
+ * Fetches the leaderboard from the browser's local storage
+ * @returns {Array}
+ */
+function getLeaderboard() {
+    var records = MemoryStorage.getItems();
 
-	let ul = document.querySelector('.deck');
-
-	let shuffled = shuffle(shapes);
-	for (let shape of shuffled) {
-		let li = document.createElement("li");
-		li.addEventListener('click', playCard);
-		li.className = "card";
-		let i = document.createElement("i");
-		i.className = "fa " + shape;
-		li.appendChild(i);
-		ul.appendChild(li);
-	}
-}
-
-addEventListener('DOMContentLoaded', init);
-
-function init() {
-	rebuildDeck(shapes);
-	resetOpenCards();
-	resetMoves();
-	resetMatchCount();
-	timer.reset();
-}
-
-// Shuffle function from http://stackoverflow.com/a/2450976
-function shuffle(array) {
-    var currentIndex = array.length, temporaryValue, randomIndex;
-
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex -= 1;
-        temporaryValue = array[currentIndex];
-        array[currentIndex] = array[randomIndex];
-        array[randomIndex] = temporaryValue;
+    var leaderboard = [];
+    for (let record of records) {
+        if (record !== null) {
+            leaderboard.push(timer.getTime(record));
+        }
     }
 
-    return array;
+    return leaderboard;
 }
 
-
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
+/**
+ * Increases the number of matched cards
  */
-
-function playCard(card) {
-	timer.start();
-
-	if (showCard(card)===false) {
-		return;
-	}
-
-	if (card.target.childNodes.length === 0) {
-		return;
-	}
-	let iClasses = card.target.childNodes[0].className.split(' ');
-	addToOpenCards(iClasses[1]);
-
-	let isMatch = function() {
-		if (openCards.length!=2) {
-			return;
-		}
-		if (openCards[0]===openCards[1]) {
-			return true;
-		}
-		return false;
-	}();
-
-	if (isMatch===true) {
-		makeMatch();
-		incrementMatchCount();
-	} else if (isMatch===false) {
-		setTimeout(misMatch, 300);
-	} else {}
-
-	incrementMoves();
-	checkWinner();
+function incrementMatchCount() {
+    matchCount += 2;
 }
 
-function showCard(card) {
-	let classList = card.target.className.split(' ');
-
-	if (classList.indexOf("open")===-1) {
-		card.target.className = "card open show";
-		return true;
-	}
-	return false;
+/**
+ * Increases the number of moves and updates the UI accordingly
+ */
+function incrementMoves() {
+    moves++;
+    document.querySelector(".moves").innerText = moves;
+    if (moves === 1) {
+        document.querySelector(".moves-text").innerText = "Move";
+    } else {
+        document.querySelector(".moves-text").innerText = "Moves";
+    }
+    decreaseStars();
 }
 
-function addToOpenCards(card) {
-	openCards.push(card);
-}
-
+/**
+ * Marks matching cards
+ */
 function makeMatch() {
-	let shape = openCards[0];
+	let key = Object.keys(openCards)[0];
+	let shape = openCards[key];
 	let cards = document.querySelectorAll('.' + shape);
 	for (let card of cards) {
 		card.parentNode.className = "card match";
@@ -211,6 +370,9 @@ function makeMatch() {
 	resetOpenCards();
 }
 
+/**
+ * Hides the shown cards because they don't match
+ */
 function misMatch() {
 	resetOpenCards();
 	let cards = document.querySelectorAll(".open");
@@ -219,30 +381,64 @@ function misMatch() {
 	}
 }
 
-function resetOpenCards() {
-	openCards = [];
+/**
+ * Initializes a new game
+ */
+function newGame() {
+    rebuildDeck(shapes);
+    resetOpenCards();
+    resetMoves();
+    resetMatchCount();
+    timer.reset();
 }
 
-function incrementMoves() {
-	moves++;
-	document.querySelector(".moves").innerText = moves;
-	if (moves === 1) {
-		document.querySelector(".moves-text").innerText = "Move";
-	} else {
-		document.querySelector(".moves-text").innerText = "Moves";
-	}
-	decreaseStars();
+/**
+ * The main stack of operations run when a card is clicked
+ * @param event
+ */
+function playCard(event) {
+    /**
+     * If the player clicked on the symbol, we send the click event to the li element.
+     */
+    if (event.target.localName === "i") {
+        event.target.parentNode.click();
+        return;
+    }
+
+    timer.start();
+
+    if (showCard(event) === false) {
+        return;
+    }
+
+    var iClasses = event.target.childNodes[0].className.split(' ');
+    addToOpenCards(event.target.id, iClasses[1]);
+
+    let isMatch = function() {
+        let keys = Object.keys(openCards);
+        if (keys.length!=2) {
+            return;
+        }
+        if (openCards[keys[0]] === openCards[keys[1]]) {
+            return true;
+        }
+        return false;
+    }();
+
+    if (isMatch===true) {
+        makeMatch();
+        incrementMatchCount();
+    } else if (isMatch===false) {
+        setTimeout(misMatch, 300);
+    } else {}
+
+    incrementMoves();
+    checkWinner();
 }
 
-function decreaseStars() {
-	if (moves === 30) {
-		removeStar();
-	}
-	if (moves === 40) {
-		removeStar();
-	}
-}
-
+/**
+ * Removes a star from the UI
+ */
 function removeStar() {
 	let stars = document.querySelectorAll(".fa-star");
 	if (stars.length === 1) {
@@ -254,66 +450,40 @@ function removeStar() {
  	}
 }
 
-function incrementMatchCount() {
-	matchCount += 2;
+/**
+ * Empties and rebuilds the deck with a new set of shuffled cards
+ * @param shapes
+ */
+function rebuildDeck(shapes) {
+    emptyDeck();
+
+    let ul = document.querySelector('.deck');
+
+    let nr = 0;
+    let shuffled = shuffle(shapes);
+    for (let shape of shuffled) {
+        let li = document.createElement("li");
+        li.addEventListener("click", playCard);
+        li.id = `card${nr}`;
+        li.className = "card";
+        let i = document.createElement("i");
+        i.className = "fa " + shape;
+        li.appendChild(i);
+        ul.appendChild(li);
+        nr++;
+    }
 }
 
-function checkWinner() {
-	if (matchCount === shapes.length) {
-		timer.stop();
-
-		let ticks = timer.getTicks();
-		let timeSpent = timer.getTime(ticks);
-		MemoryStorage.setItem(Date.now(), ticks);
-
-		let leaderboard = getLeaderboard();
-
-		let stars = document.querySelectorAll(".fa-star").length;
-		var message = `Congratulations!
-You've won ${stars} star(s) in ${timeSpent}!
-Leaderboard:`;
-		if (leaderboard.length > 0) {
-			let found = shown = false;
-			var myPosition = 0;
-			for (let i = 0; i<leaderboard.length; i++) {
-				let position = i + 1;
-				let record = leaderboard[i];
-				if (position <= 10) {
-					if (position < 10) {
-						var arrow = "     ";
-					} else {
-						var arrow = "   ";
-					}
-					if (timeSpent === record) {
-						if (found === false) {
-							var arrow = "\u25b6";
-						}
-						found = shown = true;
-					}
-					message += `
-${arrow} ${position}. ${record}`;
-				} else {
-					if (timeSpent === record && found === false) {
-						found = true;
-						myPosition = position;
-					}
-				}
-			}
-			if (shown === false) {
-				var arrow = "\u25b6";
-				message += `
-    ...
-${arrow} ${myPosition}. ${timeSpent}`;
-			}
-		}
-		message += `
-Do you want to play again?`;
-		if (confirm(message)) {
-			init();
-		}
-	}
+/**
+ * Resets the number of matches found in a match
+ */
+function resetMatchCount() {
+    matchCount = 0;
 }
 
+/**
+ * Resets the number of moves and updates the UI accordingly
+ */
 function resetMoves() {
 	moves = 0;
 	document.querySelector(".moves").innerText = moves;
@@ -328,19 +498,48 @@ function resetMoves() {
 	}
 }
 
-function resetMatchCount() {
-	matchCount = 0;
+/**
+ * Empties the object holding the open cards
+ */
+function resetOpenCards() {
+    openCards = {};
 }
 
-function getLeaderboard() {
-	var records = MemoryStorage.getItems();
-	
-	var leaderboard = [];
-	for (let record of records) {
-		if (record !== null) {
-			leaderboard.push(timer.getTime(record));
-		}
-	}
+/**
+ * Shows a card if it's not already shown
+ * @param event
+ * @returns {boolean}
+ */
+function showCard(event) {
+    let classList = event.target.className.split(' ');
 
-	return leaderboard;
+    if (classList.indexOf("open")===-1) {
+        if (event.target.localName === "i") {
+            event.target.parentNode.className = "card open show";
+        } else {
+            event.target.className = "card open show";
+        }
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Shuffles an array
+ * @param array
+ * @desc Shuffle function from http://stackoverflow.com/a/2450976
+ * @returns {*}
+ */
+function shuffle(array) {
+    var currentIndex = array.length, temporaryValue, randomIndex;
+
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+
+    return array;
 }
