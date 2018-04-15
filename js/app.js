@@ -7,14 +7,14 @@
  * @type {string[]}
  */
 const shapes = [
-    "fa-anchor", "fa-anchor",
-    "fa-bicycle", "fa-bicycle",
-    "fa-bolt", "fa-bolt",
-    "fa-bomb", "fa-bomb",
-    "fa-cube", "fa-cube",
-    "fa-diamond", "fa-diamond",
-    "fa-leaf", "fa-leaf",
-    "fa-paper-plane-o", "fa-paper-plane-o"
+    "fa-chess", "fa-chess",
+    "fa-chess-bishop", "fa-chess-bishop",
+    "fa-chess-board", "fa-chess-board",
+    "fa-chess-king", "fa-chess-king",
+    "fa-chess-knight", "fa-chess-knight",
+    "fa-chess-pawn", "fa-chess-pawn",
+    "fa-chess-queen", "fa-chess-queen",
+    "fa-chess-rook", "fa-chess-rook"
 ];
 
 /**
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', newGame);
 /**
  * Event listeners for the 'Restart Game' button
  */
-document.querySelector('.fa-repeat').addEventListener('click', newGame);
+document.querySelector('.fa-redo').addEventListener('click', newGame);
 
 /**
  * Event listeners for the modal's buttons
@@ -446,7 +446,7 @@ function rebuildDeck(shapes) {
         li.id = `card${nr}`;
         li.className = "card";
         let i = document.createElement("i");
-        i.className = "fa " + shape;
+        i.className = "fas " + shape;
         li.appendChild(i);
         ul.appendChild(li);
         nr++;
@@ -586,3 +586,10 @@ function shuffle(array) {
 
     return array;
 }
+
+/**
+ * Shortcut key
+ */
+Mousetrap.bind('r', function() { 
+    newGame();
+}, 'keypress');

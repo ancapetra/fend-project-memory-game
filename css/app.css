@@ -17,7 +17,7 @@ body {
 }
 
 body {
-    background: #ffffff url('../img/background2.jpg'); /* Background pattern from Subtle Patterns */
+    background: #ffffff url('../img/background2.jpg');
     font-family: 'Coda', cursive;
 }
 
@@ -38,10 +38,9 @@ h1:hover {
     text-shadow: 2px 1px 1px grey;
 }
 
-/*
+/**
  * Styles for the deck of cards
  */
-
 .deck {
     width: 660px;
     min-height: 680px;
@@ -110,10 +109,9 @@ h1:hover {
     font-size: 33px;
 }
 
-/*
+/**
  * Styles for the Score Panel
  */
-
 .score-panel {
     text-align: center;
     width: 345px;
@@ -141,7 +139,7 @@ h1:hover {
 .score-panel .restart {
     float: right;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 18px;
     padding-right: 1em;
 }
 
@@ -149,10 +147,9 @@ h1:hover {
     text-shadow: 2px 1px 1px grey;
 }
 
-/*
- * Make it Modal
+/**
+ * Styles for Modal
  */
-
 .hidden {
     display: none;
 }
@@ -163,22 +160,24 @@ h1:hover {
     text-shadow: 2px 2px 5px black;
 }
 
-
-/* The Modal (background) */
+/**
+* The Modal (background)
+*/
 .modal {
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    position: fixed;
+    z-index: 1;
+    padding-top: 100px;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
 }
 
-/* Modal Content */
+/**
+* Modal Content
+*/
 .modal-content {
     position: relative;
     background-color: #fefefe;
@@ -191,11 +190,12 @@ h1:hover {
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 0.4s;
-    border-radius: 20px;
+    border-radius: 25px;
 }
 
-
-/* Add Animation */
+/**
+* Add Animation
+*/
 @-webkit-keyframes animatetop {
     from {top:-300px; opacity:0}
     to {top:0; opacity:1}
@@ -206,7 +206,9 @@ h1:hover {
     to {top:0; opacity:1}
 }
 
-/* The Close Button */
+/**
+* The Close Button
+*/
 .modal-close {
     color: #ffc;
     float: right;
@@ -222,10 +224,9 @@ h1:hover {
     cursor: pointer;
 }
 
-
 .modal-header {
     padding: 2px 16px;
-    background: #808080 url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    background: #404040 url("https://www.transparenttextures.com/patterns/grunge-wall.png");
     color: #ffc;
     text-align: center;
     font-family: 'Audiowide', cursive;
@@ -235,7 +236,7 @@ h1:hover {
 
 .modal-body {
     padding: 2px 16px;
-    background: #808080 url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    background: #404040 url("https://www.transparenttextures.com/patterns/grunge-wall.png");
     color: #ffc;
     font-family: 'Ubuntu', sans-serif;
     font-size: 20px;
@@ -282,17 +283,17 @@ h1:hover {
 .modal-footer {
     padding: 1px 16px;
     padding-bottom: 1em;
-    background: #808080 url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+    background: #404040 url("https://www.transparenttextures.com/patterns/grunge-wall.png");
     color: white;
     text-align: center;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
 }
 
-button.modal-yes {
+button.modal-yes,
+button.modal-no {
     font-size: 20px;
     color: #ffc;
-    background: rgb(0, 255, 0, 0.4) url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
     width: 70px;
     height: 35px;
     margin-right: 20px;
@@ -301,28 +302,23 @@ button.modal-yes {
     font-family: 'Audiowide', cursive;
 }
 
+button.modal-yes {
+    background: rgb(0, 255, 0, 0.4) url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
+}
+
 button.modal-no {
-     font-size: 20px;
-     color: #ffc;
      background: rgb(255, 0, 0, 0.4) url("https://www.transparenttextures.com/patterns/brick-wall-dark.png");
-     width: 70px;
-     height: 35px;
-     margin-left: 20px;
-     cursor: pointer;
-     border-radius: 30px;
-     font-family: 'Audiowide', cursive;
 }
 
 button:hover {
     opacity: 0.7;
 }
 
-/*
- * Make it responsive
+/**
+ * Responsive Breakpoints
  *
  * Mobile Responsive
  */
-
  @media screen and (max-width: 399px) {
     h1 {
         font-size: 25px;
@@ -348,32 +344,32 @@ button:hover {
     }
 
     .score-panel .restart {
-        font-size: 20px;
-        padding-right: 1.5em;
+        font-size: 18px;
+        padding-right: 2em;
         padding-top: 0.2em;
     }
 
     .score-panel .stars {
         text-align: left;
-        font-size: 23px;
-        padding-left: 1.5em;
+        font-size: 18px;
+        padding-left: 2em;
         padding-top: 0.1em;
         width: 110px;
     }
 
     span.timer {
         width: 70px;
-        margin-top: 0.5em;
+        margin-top: 0.3em;
     }
 
     span.moves-text {
         width: 50px;
-        margin-top: 0.5em;
+        margin-top: 0.3em;
     }
 
     span.moves {
         width: 20px;
-        margin-top: 0.5em;
+        margin-top: 0.3em;
     }
 
     .modal-content {
@@ -402,38 +398,38 @@ button:hover {
     }
 
     .deck .card.show {
-        font-size: 30px;
+        font-size: 33px;
     }
     
     .deck .card.match {
-        font-size: 30px;
+        font-size: 33px;
     }
 
     .score-panel .restart {
-        font-size: 25px;
+        font-size: 20px;
         padding-right: 0;
     }
 
     .score-panel .stars {
         text-align: left;
-        font-size: 25px;
+        font-size: 20px;
         padding-left: 0;
         width: 90px;
     }
 
     span.timer {
         width: 100px;
-        margin-top: 0.5em;
+        margin-top: 0.2em;
     }
 
     span.moves-text {
         width: 60px;
-        margin-top: 0.5em;
+        margin-top: 0.2em;
     }
 
     span.moves {
         width: 20px;
-        margin-top: 0.5em;
+        margin-top: 0.2em;
     }
 
     .modal-content {
@@ -449,12 +445,9 @@ button:hover {
     }
 }
 
-/*
+/**
  * Tablet Responsive
  */
-
-
-
 @media screen and (min-width: 550px) and (max-width: 750px) {
     h1 {
         font-size: 40px;
@@ -472,42 +465,42 @@ button:hover {
     }
 
     .deck .card.show {
-        font-size: 35px;
+        font-size: 40px;
     }
     
     .deck .card.match {
-        font-size: 35px;
+        font-size: 40px;
     }
 
     .score-panel .restart {
         text-align: right;
-        font-size: 25px;
+        font-size: 22px;
         padding-right: 0;
         width: 20px;
     }
 
     .score-panel .stars {
         text-align: left;
-        font-size: 25px;
+        font-size: 22px;
         padding-left: 0;
         width: 90px;
     }
 
     span.timer {
         width: 80px;
-        margin-top: 0.3em;
+        margin-top: 0.1em;
         font-size: 20px;
     }
 
     span.moves-text {
         width: 60px;
-        margin-top: 0.3em;
+        margin-top: 0.1em;
         font-size: 20px;
     }
 
     span.moves {
         width: 20px;
-        margin-top: 0.3em;
+        margin-top: 0.1em;
         font-size: 20px;     
     }
 
@@ -524,22 +517,20 @@ button:hover {
     }
 }
 
-
-/*
+/**
  * Desktop Responsive
  */
-
 @media screen and (min-width: 751px) {
     h1 {
         font-size: 50px;
     }
 
     .deck .card.show {
-        font-size: 40px;
+        font-size: 50px;
     }
     
     .deck .card.match {
-        font-size: 40px;
+        font-size: 50px;
     }
 
     .score-pannel {
@@ -548,33 +539,33 @@ button:hover {
 
     .score-panel .restart {
         text-align: right;
-        font-size: 25px;
+        font-size: 21px;
         padding-right: 0;
         width: 40px;
     }
 
     .stars {
         text-align: left;
-        font-size: 25px;
+        font-size: 21px;
         padding-left: 0;
         width: 80px;
     }
 
     span.timer {
         width: 100px;
-        margin-top: 0.3em;
+        margin-top: 0.1em;
         font-size: 20px;
     }
 
     span.moves-text {
         width: 80px;
-        margin-top: 0.3em;
+        margin-top: 0.1em;
         font-size: 20px;
     }
 
     span.moves {
         width: 30px;
-        margin-top: 0.3em;
+        margin-top: 0.1em;
         font-size: 20px;     
     }
     .modal-content {
